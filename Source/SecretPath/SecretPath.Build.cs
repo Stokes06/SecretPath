@@ -8,6 +8,17 @@ public class SecretPath : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay" });
+		PrivatePCHHeaderFile = "Public/SecretPath.h";
+		
+
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			"GameplayAbilities",
+			"GameplayTags",
+			"GameplayTasks"
+		});
+		
+		PublicDependencyModuleNames.AddRange(new string[]
+			{"Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay"});
 	}
 }
