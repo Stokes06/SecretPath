@@ -13,6 +13,10 @@ class ASecretPathGameMode : public AGameModeBase
 
 public:
 	ASecretPathGameMode();
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void RespawnRequested(APlayerController* PlayerController, UClass* CharacterClass, FTransform SpawnTransform);
+	
 };
 
 

@@ -13,5 +13,15 @@ UCLASS()
 class SECRETPATH_API AHeroPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void BindRespawnOnDestroyCharacterEvent();
+
+	UFUNCTION(Server, Reliable)
+	void OnDestroy(AActor* DestroyedActor);
+	
 	
 };

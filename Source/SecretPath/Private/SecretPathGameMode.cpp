@@ -13,3 +13,31 @@ ASecretPathGameMode::ASecretPathGameMode()
 	// 	DefaultPawnClass = PlayerPawnBPClass.Class;
 	// }
 }
+
+void ASecretPathGameMode::RespawnRequested_Implementation(APlayerController* PlayerController,UClass* CharacterClass, FTransform SpawnTransform)
+{
+	if(PlayerController){
+
+		if(HasAuthority()){
+
+			FActorSpawnParameters Parameters = FActorSpawnParameters();
+			ASecretPathCharacter* Character = GetWorld()->SpawnActor<ASecretPathCharacter>(CharacterClass, SpawnTransform, Parameters);
+
+			if(!Character)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("failed to spawn"));
+				
+			} else
+			{
+				PlayerController->Possess(Character);
+			}
+			
+			
+		} else{
+
+			UE_LOG(LogTemp, Warning, TEXT("Cannot spawn because no authority"));
+			
+		}
+		
+	}
+}
