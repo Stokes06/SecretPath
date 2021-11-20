@@ -15,7 +15,7 @@ public:
 	ASecretPathGameMode();
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
-	void RespawnRequested(APlayerController* PlayerController, UClass* CharacterClass, FTransform SpawnTransform);
+	void RespawnRequested(AController* PlayerController, UClass* CharacterClass, FTransform SpawnTransform);
 	
 };
 

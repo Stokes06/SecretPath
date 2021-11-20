@@ -2,15 +2,19 @@
 
 #include "SecretPathCharacter.h"
 
+#include "SecretPathGameMode.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ASecretPathCharacter
+
+class ASecretPathGameMode;
 
 ASecretPathCharacter::ASecretPathCharacter()
 {
@@ -40,7 +44,8 @@ ASecretPathCharacter::ASecretPathCharacter()
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
@@ -56,7 +61,7 @@ void ASecretPathCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	
+
 	PlayerInputComponent->BindAction("Push", IE_Released, this, &ASecretPathCharacter::OnPushEvent);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASecretPathCharacter::MoveForward);
@@ -73,25 +78,12 @@ void ASecretPathCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	// handle touch devices
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ACharacter::StopJumping);
-
 }
 
 void ASecretPathCharacter::OnPushEvent_Implementation()
 {
 	UE_LOG(LogTemp, Warning, TEXT("C++ implementation"));
-
 }
-
-//
-// void ASecretPathCharacter::PushPlayer(ASecretPathCharacter* Character)
-// {
-// 	Character->GetMovementComponent()->AddInputVector({0, 0, 100.0f});
-// }
-//
-// void ASecretPathCharacter::onPushEvent()
-// {
-// 	
-// }
 
 void ASecretPathCharacter::TurnAtRate(float Rate)
 {
@@ -104,6 +96,43 @@ void ASecretPathCharacter::LookUpAtRate(float Rate)
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
+
+void ASecretPathCharacter::DieFallDamage_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("DIE"));
+
+	DieFallDamageEffect();
+
+	
+
+	ASecretPathGameMode* GameMode = Cast<ASecretPathGameMode>(GetWorld()->GetAuthGameMode());
+
+	if (!GameMode)
+	{
+		UE_LOG(LogTemp, Error, TEXT("No game mode"));
+		return;
+	}
+
+	FTransform Transform;
+	Transform.SetLocation({0, 0, 1500.0f});
+	GameMode->RespawnRequested(GetController(), GetClass(), Transform);
+
+	Destroy();
+	
+}
+
+
+void ASecretPathCharacter::DieFallDamageEffect_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("DIE EFFECT"));
+	FTransform Transform;
+
+	Transform.SetLocation(GetActorLocation());
+	Transform.SetScale3D({10, 10, 10});
+
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleSystemOnDeath, Transform);
+}
+
 
 void ASecretPathCharacter::MoveForward(float Value)
 {
@@ -121,12 +150,12 @@ void ASecretPathCharacter::MoveForward(float Value)
 
 void ASecretPathCharacter::MoveRight(float Value)
 {
-	if ( (Controller != nullptr) && (Value != 0.0f) )
+	if ((Controller != nullptr) && (Value != 0.0f))
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
+
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction

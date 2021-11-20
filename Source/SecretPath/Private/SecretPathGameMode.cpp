@@ -14,30 +14,35 @@ ASecretPathGameMode::ASecretPathGameMode()
 	// }
 }
 
-void ASecretPathGameMode::RespawnRequested_Implementation(APlayerController* PlayerController,UClass* CharacterClass, FTransform SpawnTransform)
+void ASecretPathGameMode::RespawnRequested_Implementation(AController* PlayerController, UClass* CharacterClass,
+                                                          FTransform SpawnTransform)
 {
-	if(PlayerController){
-
-		if(HasAuthority()){
-
+	if (PlayerController)
+	{
+		if (HasAuthority())
+		{
 			FActorSpawnParameters Parameters = FActorSpawnParameters();
-			ASecretPathCharacter* Character = GetWorld()->SpawnActor<ASecretPathCharacter>(CharacterClass, SpawnTransform, Parameters);
+			ASecretPathCharacter* Character = GetWorld()->SpawnActor<ASecretPathCharacter>(
+				CharacterClass, SpawnTransform, Parameters);
 
-			if(!Character)
+			if (!Character)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("failed to spawn"));
-				
-			} else
+				UE_LOG(LogTemp, Warning, TEXT("failed to respawn character"));
+			}
+			else
 			{
 				PlayerController->Possess(Character);
 			}
-			
-			
-		} else{
-
-			UE_LOG(LogTemp, Warning, TEXT("Cannot spawn because no authority"));
-			
 		}
-		
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Cannot spawn because no authority"));
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("Respawn done"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Player controller invalid"));
 	}
 }
