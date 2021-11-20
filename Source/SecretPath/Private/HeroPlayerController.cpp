@@ -6,6 +6,7 @@
 #include "SecretPathGameMode.h"
 #include "Engine/World.h"
 #include "GameFramework/Pawn.h"
+#include "Kismet/GameplayStatics.h"
 
 void AHeroPlayerController::BeginPlay()
 {
@@ -25,9 +26,24 @@ void AHeroPlayerController::BindRespawnOnDestroyCharacterEvent()
 	}
 }
 
+void AHeroPlayerController::OnDestroyEffect_Implementation(const FVector& ParticleSpawnLocation)
+{
+	UE_LOG(LogTemp, Warning, TEXT("actor destroyed [multicast] at %f %f %f"), ParticleSpawnLocation.X, ParticleSpawnLocation.Y, ParticleSpawnLocation.Z);
+
+	FTransform Transform;
+
+	Transform.SetLocation(ParticleSpawnLocation);
+	Transform.SetScale3D({20, 20, 20});
+
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleSystemOnDeath, Transform);
+
+	UE_LOG(LogTemp, Warning, TEXT("Particles spawned"));
+
+}
+
 void AHeroPlayerController::OnDestroy_Implementation(AActor* DestroyedActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("actor destroyed"));
+	OnDestroyEffect(DestroyedActor->GetActorLocation());
 
 	ASecretPathGameMode* GameMode = Cast<ASecretPathGameMode>(GetWorld()->GetAuthGameMode());
 
@@ -38,7 +54,7 @@ void AHeroPlayerController::OnDestroy_Implementation(AActor* DestroyedActor)
 	}
 
 	FTransform Transform;
-	Transform.SetLocation({0, 0, 250.0f});
+	Transform.SetLocation({0, 0, 1500.0f});
 	GameMode->RespawnRequested(this, DestroyedActor->GetClass(), Transform);
 
 	BindRespawnOnDestroyCharacterEvent();

@@ -20,8 +20,15 @@ class SECRETPATH_API AHeroPlayerController : public APlayerController
 	UFUNCTION()
 	void BindRespawnOnDestroyCharacterEvent();
 
-	UFUNCTION(Server, Reliable)
+	UFUNCTION(Server, Reliable, Category="On Destroy")
 	void OnDestroy(AActor* DestroyedActor);
-	
+
+	UFUNCTION(NetMulticast, Unreliable, Category="On Destroy")
+	void OnDestroyEffect(const FVector& Vector);
+
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="On Destroy")
+	UParticleSystem* ParticleSystemOnDeath;
 	
 };

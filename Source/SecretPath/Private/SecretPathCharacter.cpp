@@ -56,6 +56,8 @@ void ASecretPathCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	
+	PlayerInputComponent->BindAction("Push", IE_Released, this, &ASecretPathCharacter::OnPushEvent);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASecretPathCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASecretPathCharacter::MoveRight);
@@ -73,6 +75,23 @@ void ASecretPathCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Released, this, &ACharacter::StopJumping);
 
 }
+
+void ASecretPathCharacter::OnPushEvent_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("C++ implementation"));
+
+}
+
+//
+// void ASecretPathCharacter::PushPlayer(ASecretPathCharacter* Character)
+// {
+// 	Character->GetMovementComponent()->AddInputVector({0, 0, 100.0f});
+// }
+//
+// void ASecretPathCharacter::onPushEvent()
+// {
+// 	
+// }
 
 void ASecretPathCharacter::TurnAtRate(float Rate)
 {
